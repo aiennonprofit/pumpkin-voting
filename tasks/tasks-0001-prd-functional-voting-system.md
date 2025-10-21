@@ -46,7 +46,7 @@
   - [x] 1.7 Create `.env.example` with ADMIN_EMAILS placeholder
   - [x] 1.8 Add Firebase SDK initialization in `index.html` or create firebase initialization module
 
-- [ ] 2.0 User Authentication System
+- [x] 2.0 User Authentication System
   - [x] 2.1 Create `auth.js` module with register, login, logout, and getCurrentUser functions
   - [x] 2.2 Add login/register modal HTML to `index.html`
   - [x] 2.3 Style auth modal in `styles.css` (responsive, Halloween theme)
