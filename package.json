@@ -1,0 +1,24 @@
+{
+  "name": "pumpkin-voting",
+  "version": "1.0.0",
+  "description": "A festive web application for hosting a pumpkin carving contest with voting functionality",
+  "main": "index.html",
+  "scripts": {
+    "dev": "firebase emulators:start",
+    "deploy": "firebase deploy"
+  },
+  "keywords": [
+    "pumpkin",
+    "voting",
+    "contest",
+    "firebase"
+  ],
+  "author": "",
+  "license": "ISC",
+  "dependencies": {
+    "firebase": "^10.13.0"
+  },
+  "devDependencies": {
+    "firebase-tools": "^13.15.0"
+  }
+}

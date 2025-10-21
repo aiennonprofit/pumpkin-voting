@@ -1,0 +1,104 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Pumpkin Carving Contest</title>
+    <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+    <header>
+        <h1>🎃 Pumpkin Carving Contest 🎃</h1>
+        <nav>
+            <button id="viewGalleryBtn" class="nav-btn active">Vote</button>
+            <button id="viewResultsBtn" class="nav-btn">Results</button>
+            <button id="viewSubmitBtn" class="nav-btn">Submit Entry</button>
+        </nav>
+    </header>
+
+    <main>
+        <!-- Submit Entry Section -->
+        <section id="submitSection" class="section hidden">
+            <div class="container">
+                <h2>Submit Your Pumpkin</h2>
+                <form id="pumpkinForm">
+                    <div class="form-group">
+                        <label for="pumpkinTitle">Pumpkin Title *</label>
+                        <input type="text" id="pumpkinTitle" required placeholder="Give your pumpkin a creative name">
+                    </div>
+
+                    <div class="form-group">
+                        <label for="pumpkinDescription">Description *</label>
+                        <textarea id="pumpkinDescription" required placeholder="Tell us about your pumpkin creation..." rows="4"></textarea>
+                    </div>
+
+                    <div class="form-group">
+                        <label for="carverName">Your Name *</label>
+                        <input type="text" id="carverName" required placeholder="Your name">
+                    </div>
+
+                    <div class="form-group">
+                        <label for="pumpkinImage">Pumpkin Photo *</label>
+                        <input type="file" id="pumpkinImage" accept="image/*" required>
+                        <div id="imagePreview" class="image-preview hidden">
+                            <img id="previewImg" src="" alt="Preview">
+                        </div>
+                    </div>
+
+                    <button type="submit" class="btn btn-primary">Submit Pumpkin</button>
+                </form>
+            </div>
+        </section>
+
+        <!-- Gallery/Voting Section -->
+        <section id="gallerySection" class="section">
+            <div class="container">
+                <h2>Cast Your Vote!</h2>
+                <p class="subtitle">Click on your favorite pumpkin to vote</p>
+                <div id="pumpkinGallery" class="gallery">
+                    <!-- Pumpkins will be dynamically added here -->
+                </div>
+                <div id="noEntries" class="no-entries hidden">
+                    <p>No pumpkin entries yet. Be the first to submit!</p>
+                </div>
+            </div>
+        </section>
+
+        <!-- Results Section -->
+        <section id="resultsSection" class="section hidden">
+            <div class="container">
+                <h2>Contest Results</h2>
+                <div id="leaderboard" class="leaderboard">
+                    <!-- Results will be dynamically added here -->
+                </div>
+                <div id="noResults" class="no-entries hidden">
+                    <p>No votes cast yet!</p>
+                </div>
+            </div>
+        </section>
+    </main>
+
+    <!-- Modal for voting confirmation -->
+    <div id="voteModal" class="modal hidden">
+        <div class="modal-content">
+            <h3>Vote for this pumpkin?</h3>
+            <p id="modalPumpkinTitle"></p>
+            <div class="modal-buttons">
+                <button id="confirmVoteBtn" class="btn btn-primary">Yes, Vote!</button>
+                <button id="cancelVoteBtn" class="btn btn-secondary">Cancel</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Firebase SDK -->
+    <script src="https://www.gstatic.com/firebasejs/10.13.0/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/10.13.0/firebase-auth-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/10.13.0/firebase-firestore-compat.js"></script>
+
+    <!-- Firebase Configuration -->
+    <script src="firebase-config.js"></script>
+
+    <!-- Application Scripts -->
+    <script src="script.js"></script>
+</body>
+</html>
