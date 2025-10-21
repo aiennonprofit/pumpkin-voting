@@ -12,7 +12,11 @@ let selectedPumpkinId = null;
 document.addEventListener('DOMContentLoaded', () => {
     loadData();
     setupEventListeners();
+    setupAuthListeners();
     renderGallery();
+
+    // Setup auth state observer
+    onAuthStateChanged(handleAuthStateChange);
 });
 
 // Load data from localStorage
@@ -53,6 +57,234 @@ function setupEventListeners() {
     document.getElementById('cancelVoteBtn').addEventListener('click', closeModal);
 }
 
+// Setup authentication event listeners
+function setupAuthListeners() {
+    // Login button in header
+    const loginBtn = document.getElementById('loginBtn');
+    if (loginBtn) {
+        loginBtn.addEventListener('click', openAuthModal);
+    }
+
+    // Auth modal close button
+    document.getElementById('closeAuthModal').addEventListener('click', closeAuthModal);
+
+    // Tab switching
+    document.getElementById('loginTabBtn').addEventListener('click', () => switchAuthTab('login'));
+    document.getElementById('registerTabBtn').addEventListener('click', () => switchAuthTab('register'));
+
+    // Form submissions
+    document.getElementById('registerFormElement').addEventListener('submit', handleRegister);
+    document.getElementById('loginFormElement').addEventListener('submit', handleLogin);
+
+    // Close modal on background click
+    document.getElementById('authModal').addEventListener('click', (e) => {
+        if (e.target.id === 'authModal') {
+            closeAuthModal();
+        }
+    });
+}
+
+// Open auth modal
+function openAuthModal() {
+    document.getElementById('authModal').classList.remove('hidden');
+    switchAuthTab('login'); // Default to login tab
+}
+
+// Close auth modal
+function closeAuthModal() {
+    document.getElementById('authModal').classList.add('hidden');
+    // Clear forms
+    document.getElementById('registerFormElement').reset();
+    document.getElementById('loginFormElement').reset();
+    // Clear error messages
+    document.getElementById('registerError').classList.add('hidden');
+    document.getElementById('loginError').classList.add('hidden');
+}
+
+// Switch between login and register tabs
+function switchAuthTab(tab) {
+    const loginTab = document.getElementById('loginTabBtn');
+    const registerTab = document.getElementById('registerTabBtn');
+    const loginForm = document.getElementById('loginForm');
+    const registerForm = document.getElementById('registerForm');
+
+    if (tab === 'login') {
+        loginTab.classList.add('active');
+        registerTab.classList.remove('active');
+        loginForm.classList.remove('hidden');
+        registerForm.classList.add('hidden');
+    } else {
+        registerTab.classList.add('active');
+        loginTab.classList.remove('active');
+        registerForm.classList.remove('hidden');
+        loginForm.classList.add('hidden');
+    }
+
+    // Clear error messages when switching tabs
+    document.getElementById('registerError').classList.add('hidden');
+    document.getElementById('loginError').classList.add('hidden');
+}
+
+// Handle registration form submission
+async function handleRegister(e) {
+    e.preventDefault();
+
+    const name = document.getElementById('registerName').value.trim();
+    const email = document.getElementById('registerEmail').value.trim();
+    const password = document.getElementById('registerPassword').value;
+    const confirmPassword = document.getElementById('registerPasswordConfirm').value;
+    const errorDiv = document.getElementById('registerError');
+
+    // Clear previous errors
+    errorDiv.classList.add('hidden');
+
+    // Validate inputs
+    if (!name || !email || !password || !confirmPassword) {
+        errorDiv.textContent = 'All fields are required';
+        errorDiv.classList.remove('hidden');
+        return;
+    }
+
+    if (password.length < 8) {
+        errorDiv.textContent = 'Password must be at least 8 characters long';
+        errorDiv.classList.remove('hidden');
+        return;
+    }
+
+    if (password !== confirmPassword) {
+        errorDiv.textContent = 'Passwords do not match';
+        errorDiv.classList.remove('hidden');
+        return;
+    }
+
+    // Show loading state
+    const submitBtn = e.target.querySelector('button[type="submit"]');
+    const originalText = submitBtn.textContent;
+    submitBtn.textContent = 'Creating Account...';
+    submitBtn.disabled = true;
+
+    // Call registration function from auth.js
+    const result = await registerUser(email, password, name);
+
+    // Reset button
+    submitBtn.textContent = originalText;
+    submitBtn.disabled = false;
+
+    if (result.success) {
+        // Close modal and show success message
+        closeAuthModal();
+        showNotification('Account created successfully! Welcome!', 'success');
+    } else {
+        // Show error
+        errorDiv.textContent = result.error;
+        errorDiv.classList.remove('hidden');
+    }
+}
+
+// Handle auth state changes
+function handleAuthStateChange(user, userData) {
+    const authStatus = document.getElementById('authStatus');
+
+    if (user && userData) {
+        // User is logged in
+        const isAdmin = userData.isAdmin === true;
+
+        authStatus.innerHTML = `
+            <div class="user-info">
+                <span class="user-name">${userData.displayName}</span>
+                ${isAdmin ? '<span class="admin-badge">Admin</span>' : ''}
+            </div>
+            <button id="logoutBtn" class="btn btn-secondary">Logout</button>
+        `;
+
+        // Add logout listener
+        document.getElementById('logoutBtn').addEventListener('click', handleLogout);
+    } else {
+        // User is logged out
+        authStatus.innerHTML = '<button id="loginBtn" class="btn btn-secondary">Login</button>';
+
+        // Re-add login listener
+        document.getElementById('loginBtn').addEventListener('click', openAuthModal);
+    }
+}
+
+// Handle login form submission
+async function handleLogin(e) {
+    e.preventDefault();
+
+    const email = document.getElementById('loginEmail').value.trim();
+    const password = document.getElementById('loginPassword').value;
+    const errorDiv = document.getElementById('loginError');
+
+    // Clear previous errors
+    errorDiv.classList.add('hidden');
+
+    // Validate inputs
+    if (!email || !password) {
+        errorDiv.textContent = 'Email and password are required';
+        errorDiv.classList.remove('hidden');
+        return;
+    }
+
+    // Show loading state
+    const submitBtn = e.target.querySelector('button[type="submit"]');
+    const originalText = submitBtn.textContent;
+    submitBtn.textContent = 'Logging in...';
+    submitBtn.disabled = true;
+
+    // Call login function from auth.js
+    const result = await loginUser(email, password);
+
+    // Reset button
+    submitBtn.textContent = originalText;
+    submitBtn.disabled = false;
+
+    if (result.success) {
+        // Close modal and show success message
+        closeAuthModal();
+        showNotification('Logged in successfully! Welcome back!', 'success');
+    } else {
+        // Show error
+        errorDiv.textContent = result.error;
+        errorDiv.classList.remove('hidden');
+    }
+}
+
+// Handle logout
+async function handleLogout() {
+    // Confirm logout
+    if (!confirm('Are you sure you want to log out?')) {
+        return;
+    }
+
+    // Call logout function from auth.js
+    const result = await logoutUser();
+
+    if (result.success) {
+        showNotification('Logged out successfully. See you next time!', 'success');
+    } else {
+        showNotification('Error logging out. Please try again.', 'error');
+    }
+}
+
+// Show notification message
+function showNotification(message, type = 'success') {
+    const notification = document.createElement('div');
+    notification.className = type === 'success' ? 'success-message' : 'error-message';
+    notification.textContent = message;
+    notification.style.position = 'fixed';
+    notification.style.top = '20px';
+    notification.style.left = '50%';
+    notification.style.transform = 'translateX(-50%)';
+    notification.style.zIndex = '2000';
+
+    document.body.appendChild(notification);
+
+    setTimeout(() => {
+        notification.remove();
+    }, 3000);
+}
+
 // Show section
 function showSection(section) {
     // Hide all sections
@@ -73,6 +305,13 @@ function showSection(section) {
         document.getElementById('viewResultsBtn').classList.add('active');
         renderResults();
     } else if (section === 'submit') {
+        // Check if user is authenticated before allowing access to submit section
+        const currentUser = getCurrentUser();
+        if (!currentUser) {
+            showNotification('Please log in to submit a pumpkin entry', 'error');
+            openAuthModal();
+            return;
+        }
         document.getElementById('submitSection').classList.remove('hidden');
         document.getElementById('viewSubmitBtn').classList.add('active');
     }
@@ -94,6 +333,14 @@ function handleImagePreview(e) {
 // Handle form submission
 function handleSubmit(e) {
     e.preventDefault();
+
+    // Check if user is authenticated
+    const currentUser = getCurrentUser();
+    if (!currentUser) {
+        showNotification('Please log in to submit a pumpkin entry', 'error');
+        openAuthModal();
+        return;
+    }
 
     const title = document.getElementById('pumpkinTitle').value;
     const description = document.getElementById('pumpkinDescription').value;
@@ -177,6 +424,14 @@ function renderGallery() {
 
 // Open vote modal
 function openVoteModal(pumpkinId) {
+    // Check if user is authenticated
+    const currentUser = getCurrentUser();
+    if (!currentUser) {
+        showNotification('Please log in to vote for pumpkins', 'error');
+        openAuthModal();
+        return;
+    }
+
     selectedPumpkinId = pumpkinId;
     const pumpkin = pumpkins.find(p => p.id === pumpkinId);
 

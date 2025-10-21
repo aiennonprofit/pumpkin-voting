@@ -36,7 +36,7 @@
 
 ## Tasks
 
-- [ ] 1.0 Firebase Project Setup & Configuration
+- [x] 1.0 Firebase Project Setup & Configuration
   - [x] 1.1 Create new Firebase project in Firebase Console with name "pumpkin-voting"
   - [x] 1.2 Enable Firebase Authentication (Email/Password provider)
   - [x] 1.3 Enable Firestore Database in production mode
@@ -47,18 +47,18 @@
   - [x] 1.8 Add Firebase SDK initialization in `index.html` or create firebase initialization module
 
 - [ ] 2.0 User Authentication System
-  - [ ] 2.1 Create `auth.js` module with register, login, logout, and getCurrentUser functions
-  - [ ] 2.2 Add login/register modal HTML to `index.html`
-  - [ ] 2.3 Style auth modal in `styles.css` (responsive, Halloween theme)
-  - [ ] 2.4 Implement user registration with email/password validation (min 8 chars)
-  - [ ] 2.5 Implement user login with error handling
-  - [ ] 2.6 Implement logout functionality
-  - [ ] 2.7 Add authentication state observer to detect login/logout events
-  - [ ] 2.8 Display logged-in user's name and logout button in header
-  - [ ] 2.9 Show login/register button for unauthenticated users in header
-  - [ ] 2.10 Restrict "Submit Entry" and "Vote" actions to authenticated users only
-  - [ ] 2.11 Create user document in Firestore on registration with isAdmin flag
-  - [ ] 2.12 Set isAdmin=true for emails listed in ADMIN_EMAILS environment variable
+  - [x] 2.1 Create `auth.js` module with register, login, logout, and getCurrentUser functions
+  - [x] 2.2 Add login/register modal HTML to `index.html`
+  - [x] 2.3 Style auth modal in `styles.css` (responsive, Halloween theme)
+  - [x] 2.4 Implement user registration with email/password validation (min 8 chars)
+  - [x] 2.5 Implement user login with error handling
+  - [x] 2.6 Implement logout functionality
+  - [x] 2.7 Add authentication state observer to detect login/logout events
+  - [x] 2.8 Display logged-in user's name and logout button in header
+  - [x] 2.9 Show login/register button for unauthenticated users in header
+  - [x] 2.10 Restrict "Submit Entry" and "Vote" actions to authenticated users only
+  - [x] 2.11 Create user document in Firestore on registration with isAdmin flag
+  - [x] 2.12 Set isAdmin=true for emails listed in ADMIN_EMAILS environment variable
 
 - [ ] 3.0 Database Migration from localStorage to Firestore
   - [ ] 3.1 Create `firestore.js` service module with functions for pumpkin and vote operations
