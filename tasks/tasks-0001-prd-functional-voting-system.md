@@ -72,19 +72,19 @@
   - [x] 3.9 Update `confirmVote()` to prevent duplicate votes using Firestore transaction
   - [x] 3.10 Remove all localStorage references from `script.js`
 
-- [ ] 4.0 Admin Moderation Dashboard
-  - [ ] 4.1 Create `admin.html` page with header, pending submissions section, and approved entries section
-  - [ ] 4.2 Create `admin.css` with styles for moderation interface (cards, action buttons)
-  - [ ] 4.3 Create `admin.js` module to handle admin-only logic
-  - [ ] 4.4 Add "Admin Dashboard" button in header (visible only to admin users)
-  - [ ] 4.5 Implement admin access control - redirect non-admins away from admin page
-  - [ ] 4.6 Fetch and display all pending pumpkin submissions with images and details
-  - [ ] 4.7 Implement approve button - updates pumpkin status to 'approved', sets approvedAt and approvedBy
-  - [ ] 4.8 Implement reject button - updates pumpkin status to 'rejected'
-  - [ ] 4.9 Implement delete button - removes pumpkin document and associated votes from Firestore
-  - [ ] 4.10 Add confirmation dialogs for reject and delete actions
-  - [ ] 4.11 Display approved entries with option to delete if needed
-  - [ ] 4.12 Add "Reset All Votes" button to delete all documents in votes collection
+- [x] 4.0 Admin Moderation Dashboard
+  - [x] 4.1 Create `admin.html` page with header, pending submissions section, and approved entries section
+  - [x] 4.2 Create `admin.css` with styles for moderation interface (cards, action buttons)
+  - [x] 4.3 Create `admin.js` module to handle admin-only logic
+  - [x] 4.4 Add "Admin Dashboard" button in header (visible only to admin users)
+  - [x] 4.5 Implement admin access control - redirect non-admins away from admin page
+  - [x] 4.6 Fetch and display all pending pumpkin submissions with images and details
+  - [x] 4.7 Implement approve button - updates pumpkin status to 'approved', sets approvedAt and approvedBy
+  - [x] 4.8 Implement reject button - updates pumpkin status to 'rejected'
+  - [x] 4.9 Implement delete button - removes pumpkin document and associated votes from Firestore
+  - [x] 4.10 Add confirmation dialogs for reject and delete actions
+  - [x] 4.11 Display approved entries with option to delete if needed
+  - [x] 4.12 Add "Reset All Votes" button to delete all documents in votes collection
 
 - [ ] 5.0 Real-time Vote Synchronization
   - [ ] 5.1 Add Firestore real-time listener in `renderGallery()` for approved pumpkins

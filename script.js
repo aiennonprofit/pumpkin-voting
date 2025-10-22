@@ -5,6 +5,8 @@ const VOTED_KEY = 'hasVoted';
 let pumpkins = [];
 let votes = {};
 let selectedPumpkinId = null;
+let galleryUnsubscribe = null;
+let resultsUnsubscribe = null;
 
 // Initialize app
 document.addEventListener('DOMContentLoaded', async () => {
@@ -411,9 +413,8 @@ async function handleSubmit(e) {
             document.getElementById('pumpkinForm').reset();
             document.getElementById('imagePreview').classList.add('hidden');
 
-            // Reload data to refresh gallery
-            await loadData();
-            renderGallery();
+            // Real-time listener will automatically update the gallery if admin approves
+            // Note: Submitted pumpkins are pending and won't appear until approved
 
             // Switch to gallery after a delay
             setTimeout(() => {
@@ -430,40 +431,63 @@ async function handleSubmit(e) {
 function showSuccessMessage() {
     const message = document.createElement('div');
     message.className = 'success-message';
-    message.textContent = 'Pumpkin submitted successfully!';
+    message.textContent = 'Pumpkin submitted successfully! It will appear in the gallery after admin approval.';
 
     const form = document.getElementById('pumpkinForm');
     form.parentNode.insertBefore(message, form);
 
     setTimeout(() => {
         message.remove();
-    }, 3000);
+    }, 5000);
 }
 
-// Render gallery
+// Render gallery with real-time updates
 function renderGallery() {
     const gallery = document.getElementById('pumpkinGallery');
     const noEntries = document.getElementById('noEntries');
 
-    if (pumpkins.length === 0) {
-        gallery.innerHTML = '';
-        noEntries.classList.remove('hidden');
-        return;
+    // Unsubscribe from previous listener if exists
+    if (galleryUnsubscribe) {
+        galleryUnsubscribe();
     }
 
-    noEntries.classList.add('hidden');
+    // Set up real-time listener for approved pumpkins
+    galleryUnsubscribe = listenToApprovedPumpkins((updatedPumpkins) => {
+        pumpkins = updatedPumpkins;
 
-    gallery.innerHTML = pumpkins.map(pumpkin => `
-        <div class="pumpkin-card" onclick="openVoteModal('${pumpkin.id}')">
-            <img src="${pumpkin.image}" alt="${pumpkin.title}">
-            <div class="pumpkin-info">
-                <h3>${pumpkin.title}</h3>
-                <p class="carver">by ${pumpkin.carverName}</p>
-                <p class="description">${pumpkin.description}</p>
-                <div class="vote-count">${votes[pumpkin.id] || 0} votes</div>
-            </div>
-        </div>
-    `).join('');
+        // Update votes object
+        votes = {};
+        pumpkins.forEach(pumpkin => {
+            votes[pumpkin.id] = pumpkin.voteCount || 0;
+        });
+
+        // Get current user's vote
+        const votedFor = localStorage.getItem('votedFor');
+
+        if (pumpkins.length === 0) {
+            gallery.innerHTML = '';
+            noEntries.classList.remove('hidden');
+            return;
+        }
+
+        noEntries.classList.add('hidden');
+
+        gallery.innerHTML = pumpkins.map(pumpkin => {
+            const isVotedFor = votedFor === pumpkin.id;
+            return `
+                <div class="pumpkin-card ${isVotedFor ? 'voted-for' : ''}" onclick="openVoteModal('${pumpkin.id}')">
+                    ${isVotedFor ? '<div class="voted-badge">Your Vote</div>' : ''}
+                    <img src="${pumpkin.image}" alt="${pumpkin.title}">
+                    <div class="pumpkin-info">
+                        <h3>${pumpkin.title}</h3>
+                        <p class="carver">by ${pumpkin.carverName}</p>
+                        <p class="description">${pumpkin.description}</p>
+                        <div class="vote-count">${pumpkin.voteCount || 0} votes</div>
+                    </div>
+                </div>
+            `;
+        }).join('');
+    });
 }
 
 // Open vote modal
@@ -493,19 +517,25 @@ function closeModal() {
 async function confirmVote() {
     if (!selectedPumpkinId) return;
 
+    // Show loading state
+    const confirmBtn = document.getElementById('confirmVoteBtn');
+    const originalText = confirmBtn.textContent;
+    confirmBtn.textContent = 'Casting Vote...';
+    confirmBtn.disabled = true;
+
     // Cast vote using Firestore transaction
     const result = await castVote(selectedPumpkinId);
+
+    // Reset button
+    confirmBtn.textContent = originalText;
+    confirmBtn.disabled = false;
 
     if (result.success) {
         // Mark as voted in localStorage for UI purposes
         localStorage.setItem(VOTED_KEY, 'true');
         localStorage.setItem('votedFor', selectedPumpkinId);
 
-        // Reload data to get updated vote counts
-        await loadData();
-
         closeModal();
-        renderGallery();
 
         // Show feedback
         if (result.previousVote) {
@@ -513,6 +543,8 @@ async function confirmVote() {
         } else {
             showVoteFeedback('Vote cast successfully! Thank you for voting!');
         }
+
+        // Real-time listener will automatically update the UI
     } else {
         closeModal();
         showNotification('Error casting vote: ' + result.error, 'error');
@@ -537,40 +569,48 @@ function showVoteFeedback(text = 'Vote cast successfully! Thank you for voting!'
     }, 3000);
 }
 
-// Render results
+// Render results with real-time updates
 function renderResults() {
     const leaderboard = document.getElementById('leaderboard');
     const noResults = document.getElementById('noResults');
 
-    // Sort pumpkins by votes
-    const sortedPumpkins = [...pumpkins].sort((a, b) => {
-        return (votes[b.id] || 0) - (votes[a.id] || 0);
-    });
-
-    if (sortedPumpkins.length === 0 || Object.values(votes).every(v => v === 0)) {
-        leaderboard.innerHTML = '';
-        noResults.classList.remove('hidden');
-        return;
+    // Unsubscribe from previous listener if exists
+    if (resultsUnsubscribe) {
+        resultsUnsubscribe();
     }
 
-    noResults.classList.add('hidden');
+    // Set up real-time listener for approved pumpkins
+    resultsUnsubscribe = listenToApprovedPumpkins((updatedPumpkins) => {
+        // Sort pumpkins by votes
+        const sortedPumpkins = [...updatedPumpkins].sort((a, b) => {
+            return (b.voteCount || 0) - (a.voteCount || 0);
+        });
 
-    leaderboard.innerHTML = sortedPumpkins.map((pumpkin, index) => {
-        const voteCount = votes[pumpkin.id] || 0;
-        const isWinner = index === 0 && voteCount > 0;
+        if (sortedPumpkins.length === 0 || sortedPumpkins.every(p => (p.voteCount || 0) === 0)) {
+            leaderboard.innerHTML = '';
+            noResults.classList.remove('hidden');
+            return;
+        }
 
-        return `
-            <div class="leaderboard-item ${isWinner ? 'winner' : ''}">
-                <div class="rank">#${index + 1}</div>
-                <img src="${pumpkin.image}" alt="${pumpkin.title}" class="leaderboard-img">
-                <div class="leaderboard-info">
-                    <h3>${pumpkin.title}</h3>
-                    <p class="carver">by ${pumpkin.carverName}</p>
+        noResults.classList.add('hidden');
+
+        leaderboard.innerHTML = sortedPumpkins.map((pumpkin, index) => {
+            const voteCount = pumpkin.voteCount || 0;
+            const isWinner = index === 0 && voteCount > 0;
+
+            return `
+                <div class="leaderboard-item ${isWinner ? 'winner' : ''}">
+                    <div class="rank">#${index + 1}</div>
+                    <img src="${pumpkin.image}" alt="${pumpkin.title}" class="leaderboard-img">
+                    <div class="leaderboard-info">
+                        <h3>${pumpkin.title}</h3>
+                        <p class="carver">by ${pumpkin.carverName}</p>
+                    </div>
+                    <div class="leaderboard-votes">
+                        ${voteCount} ${voteCount === 1 ? 'vote' : 'votes'}
+                    </div>
                 </div>
-                <div class="leaderboard-votes">
-                    ${voteCount} ${voteCount === 1 ? 'vote' : 'votes'}
-                </div>
-            </div>
-        `;
-    }).join('');
+            `;
+        }).join('');
+    });
 }
