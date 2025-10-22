@@ -52,17 +52,16 @@ function checkAdminAccessSync(user, userData) {
     console.log('Admin access check:', { user: user ? user.email : null, userData, isAdmin: userData?.isAdmin });
 
     if (!user || !userData) {
-        // Not logged in, redirect to main site
-        console.error('Access denied: No user or userData');
-        alert('You must be logged in as an admin to access this page.');
+        // Not logged in, redirect silently to main site
+        console.log('Redirecting: No user or userData');
         window.location.href = 'index.html';
         return false;
     }
 
     // Check if user is admin
     if (!userData.isAdmin) {
-        console.error('Access denied: User is not admin');
-        alert('Access denied. This page is for administrators only.');
+        // Not admin, redirect silently to main site
+        console.log('Redirecting: User is not admin');
         window.location.href = 'index.html';
         return false;
     }
@@ -76,8 +75,7 @@ async function checkAdminAccess() {
     const currentUser = getCurrentUser();
 
     if (!currentUser) {
-        // Not logged in, redirect to main site
-        alert('You must be logged in as an admin to access this page.');
+        // Not logged in, redirect silently to main site
         window.location.href = 'index.html';
         return;
     }
@@ -86,7 +84,7 @@ async function checkAdminAccess() {
     const isAdmin = await isCurrentUserAdmin();
 
     if (!isAdmin) {
-        alert('Access denied. This page is for administrators only.');
+        // Not admin, redirect silently to main site
         window.location.href = 'index.html';
         return;
     }
