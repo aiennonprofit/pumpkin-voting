@@ -1,6 +1,4 @@
-// Data storage keys
-const PUMPKINS_KEY = 'pumpkinEntries';
-const VOTES_KEY = 'pumpkinVotes';
+// Data storage keys (for UI state only)
 const VOTED_KEY = 'hasVoted';
 
 // State
@@ -9,8 +7,8 @@ let votes = {};
 let selectedPumpkinId = null;
 
 // Initialize app
-document.addEventListener('DOMContentLoaded', () => {
-    loadData();
+document.addEventListener('DOMContentLoaded', async () => {
+    await loadData();
     setupEventListeners();
     setupAuthListeners();
     renderGallery();
@@ -19,24 +17,32 @@ document.addEventListener('DOMContentLoaded', () => {
     onAuthStateChanged(handleAuthStateChange);
 });
 
-// Load data from localStorage
-function loadData() {
-    const savedPumpkins = localStorage.getItem(PUMPKINS_KEY);
-    const savedVotes = localStorage.getItem(VOTES_KEY);
+// Load data from Firestore
+async function loadData() {
+    // Fetch approved pumpkins from Firestore
+    const pumpkinsResult = await getApprovedPumpkins();
 
-    if (savedPumpkins) {
-        pumpkins = JSON.parse(savedPumpkins);
+    if (pumpkinsResult.success) {
+        pumpkins = pumpkinsResult.pumpkins;
+
+        // Build votes object from pumpkin vote counts
+        votes = {};
+        pumpkins.forEach(pumpkin => {
+            votes[pumpkin.id] = pumpkin.voteCount || 0;
+        });
+    } else {
+        console.error('Error loading pumpkins:', pumpkinsResult.error);
+        pumpkins = [];
+        votes = {};
     }
 
-    if (savedVotes) {
-        votes = JSON.parse(savedVotes);
+    // Fetch current user's vote if logged in
+    const voteResult = await getUserVote();
+    if (voteResult.success && voteResult.votedFor) {
+        // Store the pumpkin ID the user voted for
+        localStorage.setItem('votedFor', voteResult.votedFor);
+        localStorage.setItem(VOTED_KEY, 'true');
     }
-}
-
-// Save data to localStorage
-function saveData() {
-    localStorage.setItem(PUMPKINS_KEY, JSON.stringify(pumpkins));
-    localStorage.setItem(VOTES_KEY, JSON.stringify(votes));
 }
 
 // Setup event listeners
@@ -331,7 +337,7 @@ function handleImagePreview(e) {
 }
 
 // Handle form submission
-function handleSubmit(e) {
+async function handleSubmit(e) {
     e.preventDefault();
 
     // Check if user is authenticated
@@ -348,36 +354,51 @@ function handleSubmit(e) {
     const imageFile = document.getElementById('pumpkinImage').files[0];
 
     if (!imageFile) {
-        alert('Please select an image');
+        showNotification('Please select an image', 'error');
         return;
     }
 
+    // Show loading state
+    const submitBtn = e.target.querySelector('button[type="submit"]');
+    const originalText = submitBtn.textContent;
+    submitBtn.textContent = 'Submitting...';
+    submitBtn.disabled = true;
+
     const reader = new FileReader();
-    reader.onload = (e) => {
-        const pumpkin = {
-            id: Date.now().toString(),
+    reader.onload = async (e) => {
+        const pumpkinData = {
             title,
             description,
             carverName,
-            image: e.target.result,
-            createdAt: new Date().toISOString()
+            image: e.target.result
         };
 
-        pumpkins.push(pumpkin);
-        votes[pumpkin.id] = 0;
-        saveData();
+        // Save to Firestore
+        const result = await createPumpkin(pumpkinData);
 
-        // Show success message
-        showSuccessMessage();
+        // Reset button
+        submitBtn.textContent = originalText;
+        submitBtn.disabled = false;
 
-        // Reset form
-        document.getElementById('pumpkinForm').reset();
-        document.getElementById('imagePreview').classList.add('hidden');
+        if (result.success) {
+            // Show success message
+            showSuccessMessage();
 
-        // Switch to gallery after a delay
-        setTimeout(() => {
-            showSection('gallery');
-        }, 2000);
+            // Reset form
+            document.getElementById('pumpkinForm').reset();
+            document.getElementById('imagePreview').classList.add('hidden');
+
+            // Reload data to refresh gallery
+            await loadData();
+            renderGallery();
+
+            // Switch to gallery after a delay
+            setTimeout(() => {
+                showSection('gallery');
+            }, 2000);
+        } else {
+            showNotification('Error submitting pumpkin: ' + result.error, 'error');
+        }
     };
     reader.readAsDataURL(imageFile);
 }
@@ -446,40 +467,40 @@ function closeModal() {
 }
 
 // Confirm vote
-function confirmVote() {
+async function confirmVote() {
     if (!selectedPumpkinId) return;
 
-    // Check if user has already voted
-    const hasVoted = localStorage.getItem(VOTED_KEY);
+    // Cast vote using Firestore transaction
+    const result = await castVote(selectedPumpkinId);
 
-    if (hasVoted) {
-        // User has voted, but let's allow them to change their vote
-        const previousVote = localStorage.getItem('votedFor');
-        if (previousVote && votes[previousVote] > 0) {
-            votes[previousVote]--;
+    if (result.success) {
+        // Mark as voted in localStorage for UI purposes
+        localStorage.setItem(VOTED_KEY, 'true');
+        localStorage.setItem('votedFor', selectedPumpkinId);
+
+        // Reload data to get updated vote counts
+        await loadData();
+
+        closeModal();
+        renderGallery();
+
+        // Show feedback
+        if (result.previousVote) {
+            showVoteFeedback('Vote changed successfully! Thank you for voting!');
+        } else {
+            showVoteFeedback('Vote cast successfully! Thank you for voting!');
         }
+    } else {
+        closeModal();
+        showNotification('Error casting vote: ' + result.error, 'error');
     }
-
-    // Add vote
-    votes[selectedPumpkinId] = (votes[selectedPumpkinId] || 0) + 1;
-
-    // Mark as voted
-    localStorage.setItem(VOTED_KEY, 'true');
-    localStorage.setItem('votedFor', selectedPumpkinId);
-
-    saveData();
-    closeModal();
-    renderGallery();
-
-    // Show feedback
-    showVoteFeedback();
 }
 
 // Show vote feedback
-function showVoteFeedback() {
+function showVoteFeedback(text = 'Vote cast successfully! Thank you for voting!') {
     const message = document.createElement('div');
     message.className = 'success-message';
-    message.textContent = 'Vote cast successfully! Thank you for voting!';
+    message.textContent = text;
     message.style.position = 'fixed';
     message.style.top = '20px';
     message.style.left = '50%';
