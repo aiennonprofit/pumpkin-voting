@@ -13,7 +13,9 @@ document.addEventListener('DOMContentLoaded', () => {
     // Setup auth state observer and check access when auth is ready
     onAuthStateChanged(async (user, userData) => {
         // Check admin access first
-        await checkAdminAccess();
+        if (!checkAdminAccessSync(user, userData)) {
+            return; // Access denied, already redirected
+        }
 
         // If we passed the check, update UI
         handleAuthStateChange(user, userData);
@@ -27,7 +29,26 @@ document.addEventListener('DOMContentLoaded', () => {
     });
 });
 
-// Check admin access and redirect if not admin
+// Synchronous admin access check using auth state data
+function checkAdminAccessSync(user, userData) {
+    if (!user || !userData) {
+        // Not logged in, redirect to main site
+        alert('You must be logged in as an admin to access this page.');
+        window.location.href = 'index.html';
+        return false;
+    }
+
+    // Check if user is admin
+    if (!userData.isAdmin) {
+        alert('Access denied. This page is for administrators only.');
+        window.location.href = 'index.html';
+        return false;
+    }
+
+    return true;
+}
+
+// Check admin access and redirect if not admin (legacy async version)
 async function checkAdminAccess() {
     const currentUser = getCurrentUser();
 
