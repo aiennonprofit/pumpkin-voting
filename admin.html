@@ -1,0 +1,88 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Admin Dashboard - Pumpkin Carving Contest</title>
+    <link rel="stylesheet" href="styles.css">
+    <link rel="stylesheet" href="admin.css">
+</head>
+<body>
+    <header>
+        <h1>🎃 Admin Dashboard 🎃</h1>
+        <nav>
+            <button id="backToSiteBtn" class="nav-btn">Back to Site</button>
+            <button id="viewPendingBtn" class="nav-btn active">Pending Submissions</button>
+            <button id="viewApprovedBtn" class="nav-btn">Approved Entries</button>
+        </nav>
+        <div id="authStatus" class="auth-status">
+            <!-- Auth status will be displayed here -->
+        </div>
+    </header>
+
+    <main>
+        <!-- Pending Submissions Section -->
+        <section id="pendingSection" class="section">
+            <div class="container">
+                <h2>Pending Submissions</h2>
+                <p class="subtitle">Review and moderate pumpkin submissions</p>
+                <div id="pendingGallery" class="admin-gallery">
+                    <!-- Pending pumpkins will be dynamically added here -->
+                </div>
+                <div id="noPending" class="no-entries hidden">
+                    <p>No pending submissions. Great job staying on top of moderation!</p>
+                </div>
+            </div>
+        </section>
+
+        <!-- Approved Entries Section -->
+        <section id="approvedSection" class="section hidden">
+            <div class="container">
+                <h2>Approved Entries</h2>
+                <p class="subtitle">Manage approved pumpkin entries</p>
+
+                <!-- Reset All Votes Button -->
+                <div class="admin-actions">
+                    <button id="resetVotesBtn" class="btn btn-danger">Reset All Votes</button>
+                </div>
+
+                <div id="approvedGallery" class="admin-gallery">
+                    <!-- Approved pumpkins will be dynamically added here -->
+                </div>
+                <div id="noApproved" class="no-entries hidden">
+                    <p>No approved entries yet. Start by approving some submissions!</p>
+                </div>
+            </div>
+        </section>
+    </main>
+
+    <!-- Confirmation Modal -->
+    <div id="confirmModal" class="modal hidden">
+        <div class="modal-content">
+            <h3 id="confirmTitle">Confirm Action</h3>
+            <p id="confirmMessage"></p>
+            <div class="modal-buttons">
+                <button id="confirmYesBtn" class="btn btn-primary">Yes</button>
+                <button id="confirmNoBtn" class="btn btn-secondary">No</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Firebase SDK -->
+    <script src="https://www.gstatic.com/firebasejs/10.13.0/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/10.13.0/firebase-auth-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/10.13.0/firebase-firestore-compat.js"></script>
+
+    <!-- Firebase Configuration -->
+    <script src="firebase-config.js"></script>
+
+    <!-- Authentication Module -->
+    <script src="auth.js"></script>
+
+    <!-- Firestore Service Module -->
+    <script src="firestore.js"></script>
+
+    <!-- Admin Scripts -->
+    <script src="admin.js"></script>
+</body>
+</html>

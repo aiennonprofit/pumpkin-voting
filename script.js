@@ -52,6 +52,14 @@ function setupEventListeners() {
     document.getElementById('viewResultsBtn').addEventListener('click', () => showSection('results'));
     document.getElementById('viewSubmitBtn').addEventListener('click', () => showSection('submit'));
 
+    // Admin Dashboard button
+    const adminBtn = document.getElementById('adminDashboardBtn');
+    if (adminBtn) {
+        adminBtn.addEventListener('click', () => {
+            window.location.href = 'admin.html';
+        });
+    }
+
     // Form submission
     document.getElementById('pumpkinForm').addEventListener('submit', handleSubmit);
 
@@ -190,6 +198,7 @@ async function handleRegister(e) {
 // Handle auth state changes
 function handleAuthStateChange(user, userData) {
     const authStatus = document.getElementById('authStatus');
+    const adminBtn = document.getElementById('adminDashboardBtn');
 
     if (user && userData) {
         // User is logged in
@@ -203,11 +212,25 @@ function handleAuthStateChange(user, userData) {
             <button id="logoutBtn" class="btn btn-secondary">Logout</button>
         `;
 
+        // Show/hide admin dashboard button
+        if (adminBtn) {
+            if (isAdmin) {
+                adminBtn.classList.remove('hidden');
+            } else {
+                adminBtn.classList.add('hidden');
+            }
+        }
+
         // Add logout listener
         document.getElementById('logoutBtn').addEventListener('click', handleLogout);
     } else {
         // User is logged out
         authStatus.innerHTML = '<button id="loginBtn" class="btn btn-secondary">Login</button>';
+
+        // Hide admin button
+        if (adminBtn) {
+            adminBtn.classList.add('hidden');
+        }
 
         // Re-add login listener
         document.getElementById('loginBtn').addEventListener('click', openAuthModal);

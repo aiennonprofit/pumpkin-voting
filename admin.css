@@ -1,0 +1,204 @@
+/* Admin Dashboard Specific Styles */
+
+/* Admin Gallery */
+.admin-gallery {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(350px, 1fr));
+    gap: 2rem;
+    margin-top: 2rem;
+}
+
+/* Admin Pumpkin Card */
+.admin-pumpkin-card {
+    background: rgba(255, 255, 255, 0.05);
+    border: 2px solid rgba(247, 147, 30, 0.3);
+    border-radius: 15px;
+    overflow: hidden;
+    transition: all 0.3s ease;
+}
+
+.admin-pumpkin-card:hover {
+    border-color: #f7931e;
+    box-shadow: 0 10px 30px rgba(247, 147, 30, 0.3);
+}
+
+.admin-pumpkin-card img {
+    width: 100%;
+    height: 250px;
+    object-fit: cover;
+}
+
+.admin-pumpkin-info {
+    padding: 1.5rem;
+}
+
+.admin-pumpkin-info h3 {
+    color: #f7931e;
+    margin-bottom: 0.5rem;
+    font-size: 1.3rem;
+}
+
+.admin-pumpkin-info .carver {
+    color: #aaa;
+    font-size: 0.9rem;
+    margin-bottom: 0.5rem;
+}
+
+.admin-pumpkin-info .description {
+    color: #ddd;
+    margin-bottom: 1rem;
+    line-height: 1.5;
+}
+
+.admin-pumpkin-info .metadata {
+    color: #888;
+    font-size: 0.85rem;
+    margin-bottom: 1rem;
+    padding-top: 0.75rem;
+    border-top: 1px solid rgba(247, 147, 30, 0.2);
+}
+
+.admin-pumpkin-info .metadata p {
+    margin: 0.25rem 0;
+}
+
+.admin-pumpkin-info .vote-count {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    color: #f7931e;
+    font-weight: bold;
+    margin-bottom: 1rem;
+}
+
+.admin-pumpkin-info .vote-count::before {
+    content: "👍";
+    font-size: 1.2rem;
+}
+
+/* Admin Action Buttons */
+.admin-actions-buttons {
+    display: flex;
+    gap: 0.75rem;
+    flex-wrap: wrap;
+}
+
+.admin-actions-buttons .btn {
+    flex: 1;
+    min-width: 100px;
+    padding: 0.75rem 1rem;
+    font-size: 0.95rem;
+}
+
+.btn-approve {
+    background: linear-gradient(135deg, #4CAF50 0%, #45a049 100%);
+    color: white;
+    border: none;
+}
+
+.btn-approve:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 5px 15px rgba(76, 175, 80, 0.4);
+}
+
+.btn-reject {
+    background: linear-gradient(135deg, #ff9800 0%, #f57c00 100%);
+    color: white;
+    border: none;
+}
+
+.btn-reject:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 5px 15px rgba(255, 152, 0, 0.4);
+}
+
+.btn-delete {
+    background: linear-gradient(135deg, #f44336 0%, #d32f2f 100%);
+    color: white;
+    border: none;
+}
+
+.btn-delete:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 5px 15px rgba(244, 67, 54, 0.4);
+}
+
+.btn-danger {
+    background: linear-gradient(135deg, #f44336 0%, #d32f2f 100%);
+    color: white;
+    border: none;
+}
+
+.btn-danger:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 5px 15px rgba(244, 67, 54, 0.4);
+}
+
+/* Admin Actions Section */
+.admin-actions {
+    display: flex;
+    justify-content: center;
+    margin-bottom: 2rem;
+    padding: 1.5rem;
+    background: rgba(255, 255, 255, 0.03);
+    border-radius: 15px;
+    border: 2px solid rgba(247, 147, 30, 0.2);
+}
+
+.admin-actions .btn {
+    padding: 1rem 2rem;
+}
+
+/* Loading State */
+.btn:disabled {
+    opacity: 0.6;
+    cursor: not-allowed;
+}
+
+/* Status Badge */
+.status-badge {
+    display: inline-block;
+    padding: 0.25rem 0.75rem;
+    border-radius: 12px;
+    font-size: 0.75rem;
+    font-weight: bold;
+    text-transform: uppercase;
+    margin-bottom: 0.5rem;
+}
+
+.status-badge.pending {
+    background: rgba(255, 152, 0, 0.2);
+    color: #ff9800;
+    border: 1px solid #ff9800;
+}
+
+.status-badge.approved {
+    background: rgba(76, 175, 80, 0.2);
+    color: #4CAF50;
+    border: 1px solid #4CAF50;
+}
+
+.status-badge.rejected {
+    background: rgba(244, 67, 54, 0.2);
+    color: #f44336;
+    border: 1px solid #f44336;
+}
+
+/* Responsive Design */
+@media (max-width: 768px) {
+    .admin-gallery {
+        grid-template-columns: 1fr;
+    }
+
+    .admin-actions-buttons {
+        flex-direction: column;
+    }
+
+    .admin-actions-buttons .btn {
+        width: 100%;
+    }
+
+    .admin-actions {
+        padding: 1rem;
+    }
+}

@@ -60,17 +60,17 @@
   - [x] 2.11 Create user document in Firestore on registration with isAdmin flag
   - [x] 2.12 Set isAdmin=true for emails listed in ADMIN_EMAILS environment variable
 
-- [ ] 3.0 Database Migration from localStorage to Firestore
-  - [ ] 3.1 Create `firestore.js` service module with functions for pumpkin and vote operations
-  - [ ] 3.2 Design Firestore collections structure (users, pumpkins, votes, config)
-  - [ ] 3.3 Replace `loadData()` to fetch pumpkins from Firestore instead of localStorage
-  - [ ] 3.4 Replace `saveData()` to save pumpkins to Firestore with status='pending'
-  - [ ] 3.5 Update `handleSubmit()` to save pumpkin with submittedBy (user ID) and createdAt timestamp
-  - [ ] 3.6 Update `renderGallery()` to display only pumpkins with status='approved'
-  - [ ] 3.7 Update vote tracking to save votes in Firestore votes collection
-  - [ ] 3.8 Implement vote count aggregation by counting votes per pumpkin
-  - [ ] 3.9 Update `confirmVote()` to prevent duplicate votes using Firestore transaction
-  - [ ] 3.10 Remove all localStorage references from `script.js`
+- [x] 3.0 Database Migration from localStorage to Firestore
+  - [x] 3.1 Create `firestore.js` service module with functions for pumpkin and vote operations
+  - [x] 3.2 Design Firestore collections structure (users, pumpkins, votes, config)
+  - [x] 3.3 Replace `loadData()` to fetch pumpkins from Firestore instead of localStorage
+  - [x] 3.4 Replace `saveData()` to save pumpkins to Firestore with status='pending'
+  - [x] 3.5 Update `handleSubmit()` to save pumpkin with submittedBy (user ID) and createdAt timestamp
+  - [x] 3.6 Update `renderGallery()` to display only pumpkins with status='approved'
+  - [x] 3.7 Update vote tracking to save votes in Firestore votes collection
+  - [x] 3.8 Implement vote count aggregation by counting votes per pumpkin
+  - [x] 3.9 Update `confirmVote()` to prevent duplicate votes using Firestore transaction
+  - [x] 3.10 Remove all localStorage references from `script.js`
 
 - [ ] 4.0 Admin Moderation Dashboard
   - [ ] 4.1 Create `admin.html` page with header, pending submissions section, and approved entries section
