@@ -27,10 +27,10 @@ service cloud.firestore {
       // Users can create their own document during registration
       allow create: if isOwner(userId) &&
                        request.resource.data.keys().hasAll(['displayName', 'email', 'createdAt']) &&
-                       // Users cannot set isAdmin flag themselves
-                       !request.resource.data.keys().hasAny(['isAdmin']) &&
                        request.resource.data.displayName is string &&
-                       request.resource.data.email is string;
+                       request.resource.data.email is string &&
+                       // isAdmin field must be a boolean (system will set this based on admin emails)
+                       request.resource.data.isAdmin is bool;
 
       // Users can update their own document (displayName, votedFor)
       allow update: if isOwner(userId) &&

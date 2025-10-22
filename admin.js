@@ -6,22 +6,25 @@ let approvedPumpkins = [];
 let confirmCallback = null;
 
 // Initialize admin dashboard
-document.addEventListener('DOMContentLoaded', async () => {
-    // Check if user is admin
-    await checkAdminAccess();
-
+document.addEventListener('DOMContentLoaded', () => {
     // Setup event listeners
     setupEventListeners();
 
-    // Setup auth state observer
-    onAuthStateChanged(handleAuthStateChange);
+    // Setup auth state observer and check access when auth is ready
+    onAuthStateChanged(async (user, userData) => {
+        // Check admin access first
+        await checkAdminAccess();
 
-    // Load initial data
-    await loadPendingPumpkins();
-    await loadApprovedPumpkins();
+        // If we passed the check, update UI
+        handleAuthStateChange(user, userData);
 
-    // Render initial view
-    renderPendingSection();
+        // Load initial data only after auth check passes
+        await loadPendingPumpkins();
+        await loadApprovedPumpkins();
+
+        // Render initial view
+        renderPendingSection();
+    });
 });
 
 // Check admin access and redirect if not admin
