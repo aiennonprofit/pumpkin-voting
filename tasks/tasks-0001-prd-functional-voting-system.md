@@ -86,13 +86,13 @@
   - [x] 4.11 Display approved entries with option to delete if needed
   - [x] 4.12 Add "Reset All Votes" button to delete all documents in votes collection
 
-- [ ] 5.0 Real-time Vote Synchronization
-  - [ ] 5.1 Add Firestore real-time listener in `renderGallery()` for approved pumpkins
-  - [ ] 5.2 Add Firestore real-time listener for votes collection to update counts live
-  - [ ] 5.3 Update vote count display on pumpkin cards when votes change
-  - [ ] 5.4 Add real-time listener in `renderResults()` to update leaderboard automatically
-  - [ ] 5.5 Implement optimistic UI updates for voting (show vote immediately, rollback on error)
-  - [ ] 5.6 Add visual indicator on pumpkin cards showing which one current user voted for
+- [x] 5.0 Real-time Vote Synchronization
+  - [x] 5.1 Add Firestore real-time listener in `renderGallery()` for approved pumpkins
+  - [x] 5.2 Add Firestore real-time listener for votes collection to update counts live
+  - [x] 5.3 Update vote count display on pumpkin cards when votes change
+  - [x] 5.4 Add real-time listener in `renderResults()` to update leaderboard automatically
+  - [x] 5.5 Implement optimistic UI updates for voting (show vote immediately, rollback on error)
+  - [x] 5.6 Add visual indicator on pumpkin cards showing which one current user voted for
 
 - [ ] 6.0 Image Storage Migration to Firebase Storage
   - [ ] 6.1 Create `storage.js` module with uploadImage and getImageUrl functions
