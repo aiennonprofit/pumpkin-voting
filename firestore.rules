@@ -85,8 +85,15 @@ service cloud.firestore {
       // Anyone can read config (needed for checking admin emails during registration)
       allow read: if true;
 
-      // Only admins can write to config
-      allow write: if isAdmin();
+      // Allow initial creation of adminEmails document if it doesn't exist (even unauthenticated)
+      // This allows the setup script to run. After creation, only admins can modify.
+      allow create: if configId == 'adminEmails' &&
+                       !exists(/databases/$(database)/documents/config/adminEmails) &&
+                       request.resource.data.keys().hasAll(['emails']) &&
+                       request.resource.data.emails is list;
+
+      // Only admins can update or delete config
+      allow update, delete: if isAdmin();
     }
 
     // Votes collection
