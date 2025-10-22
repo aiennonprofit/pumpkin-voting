@@ -136,7 +136,7 @@ function handleAuthStateChange(user, userData) {
 
         // Re-check admin access
         if (!isAdmin) {
-            alert('Your admin privileges have been revoked.');
+            // Admin privileges revoked, redirect silently
             window.location.href = 'index.html';
         }
     } else {
