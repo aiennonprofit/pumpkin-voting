@@ -80,6 +80,15 @@ service cloud.firestore {
                        request.resource.data.voteCount == resource.data.voteCount - 1;
     }
 
+    // Config collection (for admin emails and other settings)
+    match /config/{configId} {
+      // Anyone can read config (needed for checking admin emails during registration)
+      allow read: if true;
+
+      // Only admins can write to config
+      allow write: if isAdmin();
+    }
+
     // Votes collection
     match /votes/{voteId} {
       // Users can read their own votes

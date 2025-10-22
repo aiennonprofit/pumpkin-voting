@@ -1,8 +1,19 @@
 // Authentication Module
 // Handles user registration, login, logout, and session management
 
-// Admin emails list (will be set from environment/config)
-const ADMIN_EMAILS = ['admin@example.com']; // TODO: Load from environment
+// Fetch admin emails from Firestore config
+async function getAdminEmails() {
+    try {
+        const configDoc = await db.collection('config').doc('adminEmails').get();
+        if (configDoc.exists) {
+            return configDoc.data().emails || [];
+        }
+        return [];
+    } catch (error) {
+        console.error('Error fetching admin emails:', error);
+        return [];
+    }
+}
 
 // Register new user with email and password
 async function registerUser(email, password, displayName) {
@@ -25,8 +36,9 @@ async function registerUser(email, password, displayName) {
             displayName: displayName
         });
 
-        // Check if user should be admin
-        const isAdmin = ADMIN_EMAILS.includes(email.toLowerCase());
+        // Check if user should be admin (fetch from Firestore config)
+        const adminEmails = await getAdminEmails();
+        const isAdmin = adminEmails.map(e => e.toLowerCase()).includes(email.toLowerCase());
 
         // Create user document in Firestore
         await db.collection('users').doc(user.uid).set({
