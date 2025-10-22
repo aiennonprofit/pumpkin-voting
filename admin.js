@@ -10,29 +10,50 @@ document.addEventListener('DOMContentLoaded', () => {
     // Setup event listeners
     setupEventListeners();
 
-    // Setup auth state observer and check access when auth is ready
-    onAuthStateChanged(async (user, userData) => {
-        // Check admin access first
-        if (!checkAdminAccessSync(user, userData)) {
-            return; // Access denied, already redirected
-        }
-
-        // If we passed the check, update UI
-        handleAuthStateChange(user, userData);
-
-        // Load initial data only after auth check passes
-        await loadPendingPumpkins();
-        await loadApprovedPumpkins();
-
-        // Render initial view
-        renderPendingSection();
-    });
+    // Wait for auth to be ready, then check access
+    waitForAuthReady();
 });
+
+// Wait for Firebase Auth to initialize and check admin access
+async function waitForAuthReady() {
+    // Use a promise to wait for the first auth state change
+    const authState = await new Promise((resolve) => {
+        const unsubscribe = onAuthStateChanged((user, userData) => {
+            unsubscribe(); // Stop listening after first callback
+            resolve({ user, userData });
+        });
+    });
+
+    console.log('Auth ready:', authState);
+
+    // Check admin access
+    if (!checkAdminAccessSync(authState.user, authState.userData)) {
+        return; // Access denied, already redirected
+    }
+
+    // If we passed the check, update UI
+    handleAuthStateChange(authState.user, authState.userData);
+
+    // Load initial data
+    await loadPendingPumpkins();
+    await loadApprovedPumpkins();
+
+    // Render initial view
+    renderPendingSection();
+
+    // Now set up the auth observer for future changes
+    onAuthStateChanged((user, userData) => {
+        handleAuthStateChange(user, userData);
+    });
+}
 
 // Synchronous admin access check using auth state data
 function checkAdminAccessSync(user, userData) {
+    console.log('Admin access check:', { user: user ? user.email : null, userData, isAdmin: userData?.isAdmin });
+
     if (!user || !userData) {
         // Not logged in, redirect to main site
+        console.error('Access denied: No user or userData');
         alert('You must be logged in as an admin to access this page.');
         window.location.href = 'index.html';
         return false;
@@ -40,11 +61,13 @@ function checkAdminAccessSync(user, userData) {
 
     // Check if user is admin
     if (!userData.isAdmin) {
+        console.error('Access denied: User is not admin');
         alert('Access denied. This page is for administrators only.');
         window.location.href = 'index.html';
         return false;
     }
 
+    console.log('Admin access granted');
     return true;
 }
 
