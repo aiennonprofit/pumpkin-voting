@@ -149,10 +149,13 @@ h2 {
 }
 
 .image-preview img {
-    max-width: 100%;
-    max-height: 300px;
+    width: 300px;
+    height: 300px;
+    object-fit: cover;
     border-radius: 8px;
     border: 3px solid #e0c722;
+    display: block;
+    margin: 0 auto;
 }
 
 .btn {

@@ -349,6 +349,7 @@ function showSection(section) {
 }
 
 // Compress image to fit within Firestore's 1MB document limit
+// Creates a square crop for uniform display
 async function compressImage(file, maxSizeKB = 800) {
     return new Promise((resolve, reject) => {
         const reader = new FileReader();
@@ -358,24 +359,22 @@ async function compressImage(file, maxSizeKB = 800) {
                 const canvas = document.createElement('canvas');
                 const ctx = canvas.getContext('2d');
 
-                // Calculate new dimensions (max 1200px on longest side)
-                let width = img.width;
-                let height = img.height;
-                const maxDimension = 1200;
+                // Create square image (1000x1000px)
+                const squareSize = 1000;
+                canvas.width = squareSize;
+                canvas.height = squareSize;
 
-                if (width > height && width > maxDimension) {
-                    height = (height / width) * maxDimension;
-                    width = maxDimension;
-                } else if (height > maxDimension) {
-                    width = (width / height) * maxDimension;
-                    height = maxDimension;
-                }
+                // Calculate crop dimensions to center the image
+                const sourceSize = Math.min(img.width, img.height);
+                const sourceX = (img.width - sourceSize) / 2;
+                const sourceY = (img.height - sourceSize) / 2;
 
-                canvas.width = width;
-                canvas.height = height;
-
-                // Draw and compress
-                ctx.drawImage(img, 0, 0, width, height);
+                // Draw cropped square image
+                ctx.drawImage(
+                    img,
+                    sourceX, sourceY, sourceSize, sourceSize,  // source crop
+                    0, 0, squareSize, squareSize               // destination
+                );
 
                 // Start with quality 0.8 and reduce if needed
                 let quality = 0.8;
