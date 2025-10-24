@@ -1,4 +1,18 @@
 // Admin Dashboard Script
+const ADMIN_VERSION = '2025-10-23-v4-FIXED';
+console.log('🎃 Admin.js loaded - Version:', ADMIN_VERSION);
+console.log('📌 Event delegation fix applied - buttons should work now!');
+
+// Add version indicator to page
+window.addEventListener('load', () => {
+    const header = document.querySelector('header h1');
+    if (header) {
+        const versionBadge = document.createElement('small');
+        versionBadge.style.cssText = 'font-size: 10px; opacity: 0.5; margin-left: 10px;';
+        versionBadge.textContent = `v${ADMIN_VERSION}`;
+        header.appendChild(versionBadge);
+    }
+});
 
 // State
 let pendingPumpkins = [];
@@ -92,6 +106,8 @@ async function checkAdminAccess() {
 
 // Setup event listeners
 function setupEventListeners() {
+    console.log('✅ Setting up event listeners...');
+
     // Navigation
     document.getElementById('backToSiteBtn').addEventListener('click', () => {
         window.location.href = 'index.html';
@@ -108,14 +124,69 @@ function setupEventListeners() {
     // Reset votes button
     document.getElementById('resetVotesBtn').addEventListener('click', handleResetVotes);
 
-    // Confirmation modal
-    document.getElementById('confirmYesBtn').addEventListener('click', () => {
-        closeConfirmModal();
-        if (confirmCallback) {
-            confirmCallback();
-            confirmCallback = null;
+    // Event delegation for action buttons (approve, reject, delete)
+    console.log('✅ Setting up event delegation for action buttons...');
+    document.body.addEventListener('click', (e) => {
+        console.log('🖱️ Click detected on:', e.target.tagName, e.target.className);
+
+        // Check if clicked element is an action button
+        const button = e.target.closest('[data-action]');
+        if (!button) {
+            console.log('   ↳ Not an action button');
+            return;
+        }
+
+        const action = button.dataset.action;
+        const pumpkinId = button.dataset.pumpkinId;
+
+        console.log('🎯 ACTION BUTTON CLICKED:', action, 'for pumpkin:', pumpkinId);
+
+        if (action === 'approve') {
+            console.log('   ↳ Calling handleApprove');
+            handleApprove(pumpkinId);
+        } else if (action === 'reject') {
+            console.log('   ↳ Calling handleReject');
+            handleReject(pumpkinId);
+        } else if (action === 'delete') {
+            console.log('   ↳ Calling handleDelete');
+            handleDelete(pumpkinId);
         }
     });
+
+    console.log('✅ Event listeners setup complete!');
+
+    // Confirmation modal
+    const confirmYesBtn = document.getElementById('confirmYesBtn');
+    console.log('🔍 confirmYesBtn element:', confirmYesBtn);
+
+    if (confirmYesBtn) {
+        confirmYesBtn.addEventListener('click', async (e) => {
+            console.log('✅ YES BUTTON CLICKED!');
+            console.log('   confirmCallback exists?', !!confirmCallback);
+            e.preventDefault();
+            e.stopPropagation();
+
+            // Save callback before closing modal (closeConfirmModal sets confirmCallback to null)
+            const callbackToExecute = confirmCallback;
+
+            closeConfirmModal();
+
+            if (callbackToExecute) {
+                try {
+                    console.log('Executing confirm callback...');
+                    await callbackToExecute();
+                    console.log('Confirm callback completed');
+                } catch (error) {
+                    console.error('Error in confirm callback:', error);
+                    showNotification('Error: ' + error.message, 'error');
+                }
+            } else {
+                console.warn('⚠️ No callback set!');
+            }
+        });
+    } else {
+        console.error('❌ confirmYesBtn not found in DOM!');
+    }
 
     document.getElementById('confirmNoBtn').addEventListener('click', closeConfirmModal);
 }
@@ -214,9 +285,9 @@ function renderPendingSection() {
                     <p><strong>By:</strong> User ${pumpkin.submittedBy.substring(0, 8)}...</p>
                 </div>
                 <div class="admin-actions-buttons">
-                    <button class="btn btn-approve" onclick="handleApprove('${pumpkin.id}')">Approve</button>
-                    <button class="btn btn-reject" onclick="handleReject('${pumpkin.id}')">Reject</button>
-                    <button class="btn btn-delete" onclick="handleDelete('${pumpkin.id}')">Delete</button>
+                    <button class="btn btn-approve" data-action="approve" data-pumpkin-id="${pumpkin.id}">Approve</button>
+                    <button class="btn btn-reject" data-action="reject" data-pumpkin-id="${pumpkin.id}">Reject</button>
+                    <button class="btn btn-delete" data-action="delete" data-pumpkin-id="${pumpkin.id}">Delete</button>
                 </div>
             </div>
         </div>
@@ -250,7 +321,7 @@ function renderApprovedSection() {
                     <p><strong>Approved:</strong> ${formatDate(pumpkin.approvedAt)}</p>
                 </div>
                 <div class="admin-actions-buttons">
-                    <button class="btn btn-delete" onclick="handleDelete('${pumpkin.id}')">Delete</button>
+                    <button class="btn btn-delete" data-action="delete" data-pumpkin-id="${pumpkin.id}">Delete</button>
                 </div>
             </div>
         </div>
@@ -361,9 +432,11 @@ function handleResetVotes() {
 
 // Show confirmation modal
 function showConfirmModal(title, message, callback) {
+    console.log('📋 showConfirmModal called:', { title, hasCallback: !!callback });
     document.getElementById('confirmTitle').textContent = title;
     document.getElementById('confirmMessage').textContent = message;
     confirmCallback = callback;
+    console.log('   confirmCallback set, type:', typeof confirmCallback);
     document.getElementById('confirmModal').classList.remove('hidden');
 }
 

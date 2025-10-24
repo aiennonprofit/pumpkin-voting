@@ -12,6 +12,11 @@ body {
     padding-bottom: 2rem;
 }
 
+/* Utility Classes */
+.hidden {
+    display: none;
+}
+
 header {
     background: linear-gradient(135deg, #ff6b35 0%, #f7931e 100%);
     padding: 2rem 1rem;
