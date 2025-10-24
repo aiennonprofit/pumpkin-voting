@@ -348,16 +348,67 @@ function showSection(section) {
     }
 }
 
-// Handle image preview
-function handleImagePreview(e) {
-    const file = e.target.files[0];
-    if (file) {
+// Compress image to fit within Firestore's 1MB document limit
+async function compressImage(file, maxSizeKB = 800) {
+    return new Promise((resolve, reject) => {
         const reader = new FileReader();
         reader.onload = (e) => {
-            document.getElementById('previewImg').src = e.target.result;
-            document.getElementById('imagePreview').classList.remove('hidden');
+            const img = new Image();
+            img.onload = () => {
+                const canvas = document.createElement('canvas');
+                const ctx = canvas.getContext('2d');
+
+                // Calculate new dimensions (max 1200px on longest side)
+                let width = img.width;
+                let height = img.height;
+                const maxDimension = 1200;
+
+                if (width > height && width > maxDimension) {
+                    height = (height / width) * maxDimension;
+                    width = maxDimension;
+                } else if (height > maxDimension) {
+                    width = (width / height) * maxDimension;
+                    height = maxDimension;
+                }
+
+                canvas.width = width;
+                canvas.height = height;
+
+                // Draw and compress
+                ctx.drawImage(img, 0, 0, width, height);
+
+                // Start with quality 0.8 and reduce if needed
+                let quality = 0.8;
+                let compressedDataUrl = canvas.toDataURL('image/jpeg', quality);
+
+                // Keep reducing quality until size is acceptable
+                while (compressedDataUrl.length > maxSizeKB * 1024 * 1.37 && quality > 0.1) {
+                    quality -= 0.1;
+                    compressedDataUrl = canvas.toDataURL('image/jpeg', quality);
+                }
+
+                resolve(compressedDataUrl);
+            };
+            img.onerror = reject;
+            img.src = e.target.result;
         };
+        reader.onerror = reject;
         reader.readAsDataURL(file);
+    });
+}
+
+// Handle image preview
+async function handleImagePreview(e) {
+    const file = e.target.files[0];
+    if (file) {
+        try {
+            const compressedImage = await compressImage(file);
+            document.getElementById('previewImg').src = compressedImage;
+            document.getElementById('imagePreview').classList.remove('hidden');
+        } catch (error) {
+            console.error('Error processing image:', error);
+            showNotification('Error processing image. Please try a different image.', 'error');
+        }
     }
 }
 
@@ -389,13 +440,15 @@ async function handleSubmit(e) {
     submitBtn.textContent = 'Submitting...';
     submitBtn.disabled = true;
 
-    const reader = new FileReader();
-    reader.onload = async (e) => {
+    try {
+        // Compress image before uploading
+        const compressedImage = await compressImage(imageFile);
+
         const pumpkinData = {
             title,
             description,
             carverName,
-            image: e.target.result
+            image: compressedImage
         };
 
         // Save to Firestore
@@ -423,8 +476,14 @@ async function handleSubmit(e) {
         } else {
             showNotification('Error submitting pumpkin: ' + result.error, 'error');
         }
-    };
-    reader.readAsDataURL(imageFile);
+    } catch (error) {
+        // Reset button
+        submitBtn.textContent = originalText;
+        submitBtn.disabled = false;
+
+        console.error('Error processing image:', error);
+        showNotification('Error processing image: ' + error.message, 'error');
+    }
 }
 
 // Show success message
