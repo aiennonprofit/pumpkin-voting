@@ -8,18 +8,75 @@
 </head>
 <body>
     <header>
-        <h1>🎃 Pumpkin Carving Contest 🎃</h1>
-        <nav>
-            <button id="viewGalleryBtn" class="nav-btn active">Vote</button>
-            <button id="viewResultsBtn" class="nav-btn">Results</button>
-            <button id="viewSubmitBtn" class="nav-btn">Submit Entry</button>
-            <button id="adminDashboardBtn" class="nav-btn hidden">Admin Dashboard</button>
-        </nav>
-        <div id="authStatus" class="auth-status">
-            <!-- Auth status will be displayed here -->
-            <button id="loginBtn" class="btn btn-secondary">Login</button>
+        <div class="header-container">
+            <div class="header-content">
+                <h1 class="header-logo">🎃 Pumpkin Contest</h1>
+                <nav class="header-nav">
+                    <button id="viewGalleryBtn" class="nav-btn active">Vote</button>
+                    <button id="viewResultsBtn" class="nav-btn">Results</button>
+                    <button id="viewSubmitBtn" class="nav-btn">Submit Entry</button>
+                    <button id="adminDashboardBtn" class="nav-btn hidden">Admin</button>
+                </nav>
+                <div id="authStatus" class="auth-status">
+                    <!-- Auth status will be displayed here -->
+                    <button id="loginBtn" class="btn btn-secondary">Login</button>
+                </div>
+            </div>
         </div>
     </header>
+
+    <!-- Hero Section -->
+    <section class="hero">
+        <div class="hero-container">
+            <div class="hero-content-wrapper">
+                <div class="hero-text">
+                    <h1 class="hero-title">Vote for Your Favorite Pumpkin 🎃</h1>
+                    <p class="hero-description">
+                        Our team decorated pumpkins. Now we need you to pick a winner. Browse the entries,
+                        cast your vote, and help us settle this very important debate.
+                    </p>
+                    <div class="hero-buttons">
+                        <button id="heroCastVoteBtn" class="btn btn-primary btn-large">Cast My Vote</button>
+                        <button id="heroBrowseBtn" class="btn btn-outline btn-large">Browse the Gallery</button>
+                    </div>
+                    <p class="hero-support-text">
+                        One vote per person. Change your vote anytime. Winner announced November 1st, 2025.
+                    </p>
+                </div>
+                <div class="hero-image">
+                    <img src="Elijah Rising_pumpkin.png" alt="Pumpkin Contest Trophy" class="trophy-image">
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- About Section -->
+    <section class="about-section">
+        <div class="about-container">
+            <h2 class="about-heading">About</h2>
+            <div class="about-grid">
+                <div class="about-card">
+                    <h3 class="about-card-title">Why we're doing this</h3>
+                    <p class="about-card-text">
+                        Because even people who do serious work need an excuse to compete over pumpkins.
+                        Our staff serves women impacted by sexual exploitation—it's meaningful work, but
+                        it's also heavy. This is just a fun tradition that gives everyone a break and a
+                        reason to get a little competitive.
+                    </p>
+                </div>
+                <div class="about-card">
+                    <h3 class="about-card-title">Our mission</h3>
+                    <p class="about-card-text">
+                        We exist to end sex trafficking through prayer, awareness, intervention, and restoration.
+                    </p>
+                    <div class="about-links">
+                        <a href="https://elijahrising.org" target="_blank" class="about-link">Learn About Elijah Rising</a>
+                        <a href="https://elijahrising.org/donate" target="_blank" class="about-link">Make a Donation</a>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
 
     <main>
         <!-- Submit Entry Section -->

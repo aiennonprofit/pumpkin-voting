@@ -54,6 +54,18 @@ function setupEventListeners() {
     document.getElementById('viewResultsBtn').addEventListener('click', () => showSection('results'));
     document.getElementById('viewSubmitBtn').addEventListener('click', () => showSection('submit'));
 
+    // Hero buttons
+    document.getElementById('heroCastVoteBtn').addEventListener('click', () => {
+        showSection('gallery');
+        // Scroll to gallery
+        document.getElementById('gallerySection').scrollIntoView({ behavior: 'smooth', block: 'start' });
+    });
+    document.getElementById('heroBrowseBtn').addEventListener('click', () => {
+        showSection('gallery');
+        // Scroll to gallery
+        document.getElementById('gallerySection').scrollIntoView({ behavior: 'smooth', block: 'start' });
+    });
+
     // Admin Dashboard button
     const adminBtn = document.getElementById('adminDashboardBtn');
     if (adminBtn) {
