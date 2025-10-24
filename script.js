@@ -556,14 +556,16 @@ function renderGallery() {
 
         gallery.innerHTML = pumpkins.map(pumpkin => {
             const isVotedFor = votedFor === pumpkin.id;
+            // Sanitize user input to prevent XSS attacks
+            const safe = sanitizePumpkin(pumpkin);
             return `
-                <div class="pumpkin-card ${isVotedFor ? 'voted-for' : ''}" onclick="openVoteModal('${pumpkin.id}')">
+                <div class="pumpkin-card ${isVotedFor ? 'voted-for' : ''}" onclick="openVoteModal('${escapeHtml(pumpkin.id)}')">
                     ${isVotedFor ? '<div class="voted-badge">Your Vote</div>' : ''}
-                    <img src="${pumpkin.image}" alt="${pumpkin.title}">
+                    <img src="${pumpkin.image}" alt="${safe.title}">
                     <div class="pumpkin-info">
-                        <h3>${pumpkin.title}</h3>
-                        <p class="carver">by ${pumpkin.carverName}</p>
-                        <p class="description">${pumpkin.description}</p>
+                        <h3>${safe.title}</h3>
+                        <p class="carver">by ${safe.carverName}</p>
+                        <p class="description">${safe.description}</p>
                         <div class="vote-count">${pumpkin.voteCount || 0} votes</div>
                     </div>
                 </div>
@@ -585,6 +587,7 @@ function openVoteModal(pumpkinId) {
     selectedPumpkinId = pumpkinId;
     const pumpkin = pumpkins.find(p => p.id === pumpkinId);
 
+    // Using textContent (not innerHTML) is safe from XSS
     document.getElementById('modalPumpkinTitle').textContent = pumpkin.title;
     document.getElementById('voteModal').classList.remove('hidden');
 }
@@ -679,14 +682,16 @@ function renderResults() {
         leaderboard.innerHTML = sortedPumpkins.map((pumpkin, index) => {
             const voteCount = pumpkin.voteCount || 0;
             const isWinner = index === 0 && voteCount > 0;
+            // Sanitize user input to prevent XSS attacks
+            const safe = sanitizePumpkin(pumpkin);
 
             return `
                 <div class="leaderboard-item ${isWinner ? 'winner' : ''}">
                     <div class="rank">#${index + 1}</div>
-                    <img src="${pumpkin.image}" alt="${pumpkin.title}" class="leaderboard-img">
+                    <img src="${pumpkin.image}" alt="${safe.title}" class="leaderboard-img">
                     <div class="leaderboard-info">
-                        <h3>${pumpkin.title}</h3>
-                        <p class="carver">by ${pumpkin.carverName}</p>
+                        <h3>${safe.title}</h3>
+                        <p class="carver">by ${safe.carverName}</p>
                     </div>
                     <div class="leaderboard-votes">
                         ${voteCount} ${voteCount === 1 ? 'vote' : 'votes'}

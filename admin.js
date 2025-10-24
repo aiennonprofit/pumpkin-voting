@@ -272,26 +272,30 @@ function renderPendingSection() {
 
     noEntries.classList.add('hidden');
 
-    gallery.innerHTML = pendingPumpkins.map(pumpkin => `
+    gallery.innerHTML = pendingPumpkins.map(pumpkin => {
+        // Sanitize user input to prevent XSS attacks
+        const safe = sanitizePumpkin(pumpkin);
+        return `
         <div class="admin-pumpkin-card">
-            <img src="${pumpkin.image}" alt="${pumpkin.title}">
+            <img src="${pumpkin.image}" alt="${safe.title}">
             <div class="admin-pumpkin-info">
                 <span class="status-badge pending">Pending</span>
-                <h3>${pumpkin.title}</h3>
-                <p class="carver">by ${pumpkin.carverName}</p>
-                <p class="description">${pumpkin.description}</p>
+                <h3>${safe.title}</h3>
+                <p class="carver">by ${safe.carverName}</p>
+                <p class="description">${safe.description}</p>
                 <div class="metadata">
                     <p><strong>Submitted:</strong> ${formatDate(pumpkin.submittedAt)}</p>
-                    <p><strong>By:</strong> User ${pumpkin.submittedBy.substring(0, 8)}...</p>
+                    <p><strong>By:</strong> User ${escapeHtml(pumpkin.submittedBy.substring(0, 8))}...</p>
                 </div>
                 <div class="admin-actions-buttons">
-                    <button class="btn btn-approve" data-action="approve" data-pumpkin-id="${pumpkin.id}">Approve</button>
-                    <button class="btn btn-reject" data-action="reject" data-pumpkin-id="${pumpkin.id}">Reject</button>
-                    <button class="btn btn-delete" data-action="delete" data-pumpkin-id="${pumpkin.id}">Delete</button>
+                    <button class="btn btn-approve" data-action="approve" data-pumpkin-id="${escapeHtml(pumpkin.id)}">Approve</button>
+                    <button class="btn btn-reject" data-action="reject" data-pumpkin-id="${escapeHtml(pumpkin.id)}">Reject</button>
+                    <button class="btn btn-delete" data-action="delete" data-pumpkin-id="${escapeHtml(pumpkin.id)}">Delete</button>
                 </div>
             </div>
         </div>
-    `).join('');
+        `;
+    }).join('');
 }
 
 // Render approved section
@@ -307,25 +311,29 @@ function renderApprovedSection() {
 
     noEntries.classList.add('hidden');
 
-    gallery.innerHTML = approvedPumpkins.map(pumpkin => `
+    gallery.innerHTML = approvedPumpkins.map(pumpkin => {
+        // Sanitize user input to prevent XSS attacks
+        const safe = sanitizePumpkin(pumpkin);
+        return `
         <div class="admin-pumpkin-card">
-            <img src="${pumpkin.image}" alt="${pumpkin.title}">
+            <img src="${pumpkin.image}" alt="${safe.title}">
             <div class="admin-pumpkin-info">
                 <span class="status-badge approved">Approved</span>
-                <h3>${pumpkin.title}</h3>
-                <p class="carver">by ${pumpkin.carverName}</p>
-                <p class="description">${pumpkin.description}</p>
+                <h3>${safe.title}</h3>
+                <p class="carver">by ${safe.carverName}</p>
+                <p class="description">${safe.description}</p>
                 <div class="vote-count">${pumpkin.voteCount || 0} votes</div>
                 <div class="metadata">
                     <p><strong>Submitted:</strong> ${formatDate(pumpkin.submittedAt)}</p>
                     <p><strong>Approved:</strong> ${formatDate(pumpkin.approvedAt)}</p>
                 </div>
                 <div class="admin-actions-buttons">
-                    <button class="btn btn-delete" data-action="delete" data-pumpkin-id="${pumpkin.id}">Delete</button>
+                    <button class="btn btn-delete" data-action="delete" data-pumpkin-id="${escapeHtml(pumpkin.id)}">Delete</button>
                 </div>
             </div>
         </div>
-    `).join('');
+        `;
+    }).join('');
 }
 
 // Handle approve

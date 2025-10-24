@@ -82,8 +82,9 @@ service cloud.firestore {
 
     // Config collection (for admin emails and other settings)
     match /config/{configId} {
-      // Anyone can read config (needed for checking admin emails during registration)
-      allow read: if true;
+      // Only authenticated users can read config during registration
+      // This prevents enumeration of admin emails by anonymous users
+      allow read: if isAuthenticated();
 
       // Allow initial creation of adminEmails document if it doesn't exist (even unauthenticated)
       // This allows the setup script to run. After creation, only admins can modify.

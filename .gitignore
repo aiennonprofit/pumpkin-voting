@@ -33,3 +33,26 @@ build/
 # Temporary files
 .tmp/
 .cache/
+
+# Documentation artifacts (keep README.md and CLAUDE.md)
+*_FIX*.md
+*_SUMMARY.md
+*_COMPLETE.md
+*_RESULTS.md
+*_REVIEW.md
+*_VERIFICATION.md
+*_CHECKLIST.md
+*_PAYLOADS.md
+
+# Test and debug files
+test_*.py
+check-*.html
+debug_*.html
+*_test.html
+
+# Test images
+*.png
+*.jpg
+*.jpeg
+!logo.png
+!favicon.png
