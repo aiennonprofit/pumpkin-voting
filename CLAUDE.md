@@ -139,5 +139,5 @@ The project is configured for Firebase project `pumpkin-voting`:
 - **No tests**: This project was built as a quick MVP without a testing framework
 - **Admin emails**: Managed through Firestore config, not environment variables
 - **Two HTML pages**: `index.html` (public) and `admin.html` (admin-only)
-- **Halloween theme**: Orange (#f7931e) and dark blue (#16213e) color scheme
+- **Elijah Risings branding**: Yellow (#e0c722) and black (#222222) color scheme
 - **Real-time by default**: All views use live listeners, not one-time queries
