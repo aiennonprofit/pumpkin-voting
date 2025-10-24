@@ -343,10 +343,18 @@ function showSection(section) {
         document.getElementById('gallerySection').classList.remove('hidden');
         document.getElementById('viewGalleryBtn').classList.add('active');
         renderGallery();
+        // Scroll to section
+        setTimeout(() => {
+            document.getElementById('gallerySection').scrollIntoView({ behavior: 'smooth', block: 'start' });
+        }, 100);
     } else if (section === 'results') {
         document.getElementById('resultsSection').classList.remove('hidden');
         document.getElementById('viewResultsBtn').classList.add('active');
         renderResults();
+        // Scroll to section
+        setTimeout(() => {
+            document.getElementById('resultsSection').scrollIntoView({ behavior: 'smooth', block: 'start' });
+        }, 100);
     } else if (section === 'submit') {
         // Check if user is authenticated before allowing access to submit section
         const currentUser = getCurrentUser();
@@ -357,6 +365,10 @@ function showSection(section) {
         }
         document.getElementById('submitSection').classList.remove('hidden');
         document.getElementById('viewSubmitBtn').classList.add('active');
+        // Scroll to section
+        setTimeout(() => {
+            document.getElementById('submitSection').scrollIntoView({ behavior: 'smooth', block: 'start' });
+        }, 100);
     }
 }
 
